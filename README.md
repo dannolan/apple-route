@@ -1,25 +1,48 @@
-# apple-route
+# 🗺️ apple-route
 
-`apple-route` is a small, hackable, macOS-only command-line interface to Apple's native MapKit. It gives humans, shell scripts, and LLM agents access to place search, routes, turn-by-turn steps, and ETAs without a GUI, backend, API key, or hosted service.
+Apple Maps from your terminal.
 
-It is an experimental developer tool. It is not a production routing platform.
+`apple-route` is a small, hackable, macOS-only CLI over Apple's native MapKit. Search for places, calculate routes, get ETAs, and hand clean JSON to shell scripts or LLM agents.
 
-## Requirements
+No API keys. No backend. No account. No hosted service. Just one Swift executable talking to the MapKit already on your Mac. ✨
 
-- macOS 13 or newer
-- Xcode 15 or newer to build from source
-- Network access for live MapKit requests
+This is an experimental developer tool, not a production routing platform. That's the point.
 
-## Install
-
-Once the repository owner has published the tap:
+## 🍺 Install
 
 ```sh
 brew tap dannolan/tap
 brew install apple-route
 ```
 
-Until then, build locally:
+Then give it a spin:
+
+```sh
+apple-route route \
+  --from "Sydney Town Hall" \
+  --to "Sydney Opera House" \
+  --mode walking
+```
+
+## Why this exists
+
+Apple's native place and routing data is excellent, but it normally lives behind a GUI. I wanted the useful bits in Terminal—something a human can poke at, a shell script can compose, and an agent can call without standing up another service.
+
+So this stays deliberately boring:
+
+- 🧭 Native `MKLocalSearch` and `MKDirections`
+- 🤖 Stable Codable JSON for agents and scripts
+- 🔐 No credentials, JWTs, databases, daemons, or telemetry
+- 🔧 Compact Swift you can actually read and hack on
+- 🍎 macOS only, unapologetically
+
+## ✅ Requirements
+
+- macOS 13 or newer
+- Xcode 15 or newer to build from source
+- Network access for live MapKit requests
+
+Prefer building it yourself? Go for it:
 
 ```sh
 git clone https://github.com/dannolan/apple-route.git
@@ -30,7 +53,7 @@ install -m 755 .build/release/apple-route /usr/local/bin/apple-route
 
 On Apple Silicon, use `/opt/homebrew/bin/apple-route` as the install destination if that directory is on your `PATH`.
 
-## Search
+## 🔎 Search
 
 ```sh
 apple-route search "Art Gallery of NSW"
@@ -40,7 +63,7 @@ apple-route search "Sydney Airport" --limit 5 --json
 
 Search results include names, formatted addresses where available, coordinates, phone numbers, URLs, and point-of-interest categories.
 
-## Routes
+## 🚗 Routes
 
 Inputs can be natural-language places/addresses or `latitude,longitude` coordinates.
 
@@ -61,7 +84,7 @@ apple-route route \
 
 Modes are `driving`, `walking`, `transit`, and `cycling`. Cycling requires a supported macOS SDK/runtime and route coverage. `--depart` and `--arrive` accept ISO-8601 timestamps and are mutually exclusive. Use `--near=latitude,longitude` to bias natural-language endpoint resolution.
 
-## ETA
+## ⏱️ ETA
 
 ```sh
 apple-route eta \
@@ -71,9 +94,9 @@ apple-route eta \
   --json
 ```
 
-## JSON and agent use
+## 🤖 JSON and agent use
 
-With `--json`, stdout contains one stable Codable JSON envelope and nothing else. Diagnostics and structured error envelopes go to stderr. The schema starts at version 1.
+With `--json`, stdout is JSON. Full stop. Diagnostics and structured error envelopes go to stderr, so piping into `jq` won't become a small personal tragedy. The schema starts at version 1.
 
 ```json
 {
@@ -92,7 +115,7 @@ With `--json`, stdout contains one stable Codable JSON envelope and nothing else
 
 Optional values may be omitted by Swift's default `Codable` encoding when MapKit does not provide them.
 
-An LLM agent can request an arrival-aware transit route and parse it directly:
+An LLM agent can request an arrival-aware public transport route and parse it directly:
 
 ```sh
 apple-route route \
@@ -112,7 +135,7 @@ apple-route eta --from "$ORIGIN" --to "$DESTINATION" --mode walking --json \
 
 Exit codes are stable: `2` invalid arguments, `3` place not found, `4` ambiguous place, `5` route unavailable, `6` network/MapKit failure, and `7` unsupported transport mode.
 
-## Development and tests
+## 🧪 Development and tests
 
 ```sh
 swift build -c release
@@ -120,9 +143,9 @@ swift test
 ./Scripts/smoke-test.sh
 ```
 
-Unit tests do not contact Apple services. The smoke script is intentionally opt-in; it performs live Sydney search, walking-route, and ETA requests and validates every JSON response with `jq`.
+Unit tests stay fast and do not contact Apple services. The smoke script is intentionally opt-in: it hits live MapKit with a Sydney search, walking route, and ETA, then makes sure every response survives `jq`.
 
-## Homebrew release process
+## 🚀 Homebrew release process
 
 For each release, update the formula SHA-256 with the published source archive checksum.
 
@@ -169,7 +192,7 @@ For each release, update the formula SHA-256 with the published source archive c
 
 Do not create the tag until the version and formula URL are final: GitHub-generated source archives can change checksum if a tag is moved.
 
-## Troubleshooting and limitations
+## 🧯 Troubleshooting and limitations
 
 - **Missing route:** MapKit may not offer the requested mode between those points. Try explicit coordinates, a different mode, or omit a future departure/arrival time.
 - **Ambiguous place:** Add city/state/country context or use `--near`. The resolver refuses obviously unrelated top results instead of silently choosing one.
@@ -179,10 +202,10 @@ Do not create the tag until the version and formula URL are final: GitHub-genera
 - **Transit:** The macOS MapKit SDK exposes transit through `calculateETA()` but may not return detailed routes from `calculate()`. When transit ETA data exists but detailed directions do not, `route` returns one clearly identified `Transit ETA` result with an advisory notice and no steps or alternatives. Coverage and schedule horizons vary by region.
 - **Output:** Names, instructions, units, and notices can be localized by the current macOS environment.
 
-This project uses Apple's on-device native frameworks only. It has no server API, authentication, database, daemon, telemetry, or cloud component.
+This project uses Apple's native frameworks only. There is no server API, authentication, database, daemon, telemetry, or cloud component hiding around the corner.
 
 `apple-route` is an independent project and is not affiliated with or endorsed by Apple Inc. Apple, Apple Maps, MapKit, and macOS are trademarks of Apple Inc.
 
-## License
+## 📄 License
 
 MIT. See [LICENSE](LICENSE).
