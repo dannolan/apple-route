@@ -39,19 +39,7 @@ So this stays deliberately boring:
 ## ✅ Requirements
 
 - macOS 13 or newer
-- Xcode 15 or newer to build from source
 - Network access for live MapKit requests
-
-Prefer building it yourself? Go for it:
-
-```sh
-git clone https://github.com/dannolan/apple-route.git
-cd apple-route
-swift build -c release
-install -m 755 .build/release/apple-route /usr/local/bin/apple-route
-```
-
-On Apple Silicon, use `/opt/homebrew/bin/apple-route` as the install destination if that directory is on your `PATH`.
 
 ## 🔎 Search
 
@@ -134,63 +122,6 @@ apple-route eta --from "$ORIGIN" --to "$DESTINATION" --mode walking --json \
 ```
 
 Exit codes are stable: `2` invalid arguments, `3` place not found, `4` ambiguous place, `5` route unavailable, `6` network/MapKit failure, and `7` unsupported transport mode.
-
-## 🧪 Development and tests
-
-```sh
-swift build -c release
-swift test
-./Scripts/smoke-test.sh
-```
-
-Unit tests stay fast and do not contact Apple services. The smoke script is intentionally opt-in: it hits live MapKit with a Sydney search, walking route, and ETA, then makes sure every response survives `jq`.
-
-## 🚀 Homebrew release process
-
-For each release, update the formula SHA-256 with the published source archive checksum.
-
-1. Confirm tests and create the version tag:
-
-   ```sh
-   swift test
-   git tag -a v0.1.0 -m "apple-route 0.1.0"
-   git push origin v0.1.0
-   ```
-
-2. The source tarball URL is:
-
-   ```text
-   https://github.com/dannolan/apple-route/archive/refs/tags/v0.1.0.tar.gz
-   ```
-
-3. Download it and calculate SHA-256:
-
-   ```sh
-   curl -L -o apple-route-0.1.0.tar.gz \
-     https://github.com/dannolan/apple-route/archive/refs/tags/v0.1.0.tar.gz
-   shasum -a 256 apple-route-0.1.0.tar.gz
-   ```
-
-4. Update the `url`, `sha256`, and version reported by the executable in `Formula/apple-route.rb` and `Sources/AppleRoute/AppleRoute.swift`.
-
-5. Test the formula from this checkout:
-
-   ```sh
-   brew install --build-from-source ./Formula/apple-route.rb
-   brew test apple-route
-   brew audit --new-formula --strict ./Formula/apple-route.rb
-   brew uninstall apple-route
-   ```
-
-6. Copy the formula to the `homebrew-tap` repository, commit and push it, then test the public tap:
-
-   ```sh
-   brew tap dannolan/tap
-   brew install --build-from-source dannolan/tap/apple-route
-   brew test dannolan/tap/apple-route
-   ```
-
-Do not create the tag until the version and formula URL are final: GitHub-generated source archives can change checksum if a tag is moved.
 
 ## 🧯 Troubleshooting and limitations
 
