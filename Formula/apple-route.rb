@@ -2,8 +2,7 @@ class AppleRoute < Formula
   desc "Native Apple MapKit place search, routes, and ETAs from Terminal"
   homepage "https://github.com/dannolan/apple-route"
   url "https://github.com/dannolan/apple-route/archive/refs/tags/v0.1.0.tar.gz"
-  # Replace this all-zero placeholder with the release tarball's SHA-256.
-  sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+  sha256 "e98a5de300792d90bfaf0b3db76db178833b008a9408f1d68c99ee31dea56180"
   license "MIT"
   head "https://github.com/dannolan/apple-route.git", branch: "main"
 

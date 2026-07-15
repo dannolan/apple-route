@@ -124,7 +124,7 @@ Unit tests do not contact Apple services. The smoke script is intentionally opt-
 
 ## Homebrew release process
 
-Before creating a release, replace the formula's all-zero SHA-256 placeholder with the published source archive checksum.
+For each release, update the formula SHA-256 with the published source archive checksum.
 
 1. Confirm tests and create the version tag:
 
